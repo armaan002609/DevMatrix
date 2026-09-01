@@ -12,7 +12,7 @@ export default function Register() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  if (user) return <Navigate to="/profile" />;
+  if (user) return <Navigate to="/" />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function Register() {
       if (data?.user && !data?.session) {
         setSuccessMsg('Registration successful! Please check your email to verify your account before logging in.');
       } else {
-        navigate('/profile');
+        navigate('/');
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed');

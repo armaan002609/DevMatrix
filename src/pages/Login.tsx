@@ -10,7 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  if (user) return <Navigate to="/profile" />;
+  if (user) return <Navigate to="/" />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ export default function Login() {
         password,
       });
       if (signInError) throw signInError;
-      navigate('/profile');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     }
