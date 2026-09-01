@@ -34,11 +34,11 @@ export default function Home() {
           <span className="badge-label">NEW</span>
           Join the DevMatrix Ecosystem &rarr;
         </div>
-        <h1 style={{ marginBottom: '16px', fontSize: '4.5rem', lineHeight: '1.1', maxWidth: '1000px' }}>
+        <h1 style={{ marginBottom: '16px', lineHeight: '1.1', maxWidth: '1000px' }}>
           Full-Stack Software Development<br />
           &amp; Product Engineering.
         </h1>
-        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '900px', marginBottom: '40px', fontWeight: 400 }}>
+        <p className="hero-description" style={{ color: 'var(--text-secondary)', maxWidth: '900px', marginBottom: '40px', fontWeight: 400 }}>
           Our mission is to establish a collaborative software innovation ecosystem where students design, develop, deploy, and maintain real-world software solutions. We are here to foster innovation, drive entrepreneurship, and make meaningful open-source contributions.
         </p>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
