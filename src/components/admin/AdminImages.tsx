@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import ImageCarousel from '../ImageCarousel';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export default function AdminImages() {
   const { user } = useAuth();
@@ -12,6 +13,7 @@ export default function AdminImages() {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
 
@@ -24,11 +26,42 @@ export default function AdminImages() {
     fetchImages();
   }, []);
 
+  // Manage Preview URLs to prevent memory leaks
+  useEffect(() => {
+    const objectUrls = files.map(file => URL.createObjectURL(file));
+    setPreviews(objectUrls);
+    
+    return () => {
+      objectUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [files]);
+
   const fetchImages = async () => {
     setLoading(true);
     const { data, error } = await supabase.from('images').select('*').order('created_at', { ascending: false });
     if (!error && data) setImages(data);
     setLoading(false);
+  };
+
+  const moveFile = (index: number, direction: 'left' | 'right') => {
+    if (direction === 'left' && index === 0) return;
+    if (direction === 'right' && index === files.length - 1) return;
+
+    const newFiles = [...files];
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    
+    // Swap
+    const temp = newFiles[index];
+    newFiles[index] = newFiles[targetIndex];
+    newFiles[targetIndex] = temp;
+    
+    setFiles(newFiles);
+  };
+
+  const removeFile = (index: number) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -40,7 +73,7 @@ export default function AdminImages() {
     try {
       const uploadedUrls: string[] = [];
 
-      // 1. Upload all images to Supabase Storage
+      // 1. Upload all images to Supabase Storage in the current order
       for (const currentFile of files) {
         const fileExt = currentFile.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
@@ -166,12 +199,56 @@ export default function AdminImages() {
               multiple
               onChange={e => {
                 if (e.target.files) {
+                  // Append new files instead of replacing entirely if they select more,
+                  // or just replace. Let's just replace as per standard input=file behavior.
                   setFiles(Array.from(e.target.files));
                 }
               }} 
-              required 
             />
           </div>
+          
+          {/* Previews and Rearranging */}
+          {previews.length > 0 && (
+            <div style={{ marginBottom: '16px' }}>
+              <label className="form-label">Rearrange Images</label>
+              <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '12px' }}>
+                {previews.map((previewUrl, index) => (
+                  <div key={previewUrl} style={{ position: 'relative', width: '120px', flex: '0 0 120px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                    <img src={previewUrl} alt={`Preview ${index}`} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', display: 'flex', justifyContent: 'space-between', padding: '4px', background: 'rgba(0,0,0,0.5)' }}>
+                      <button 
+                        type="button"
+                        onClick={() => moveFile(index, 'left')} 
+                        disabled={index === 0}
+                        style={{ background: 'none', border: 'none', color: index === 0 ? 'rgba(255,255,255,0.3)' : 'white', cursor: index === 0 ? 'default' : 'pointer' }}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => removeFile(index)} 
+                        style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer' }}
+                      >
+                        <X size={16} />
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => moveFile(index, 'right')} 
+                        disabled={index === previews.length - 1}
+                        style={{ background: 'none', border: 'none', color: index === previews.length - 1 ? 'rgba(255,255,255,0.3)' : 'white', cursor: index === previews.length - 1 ? 'default' : 'pointer' }}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                    <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,0,0,0.7)', color: 'white', fontSize: '0.75rem', textAlign: 'center', padding: '2px 0' }}>
+                      {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="form-group">
             <label className="form-label">Description (Optional)</label>
             <textarea 

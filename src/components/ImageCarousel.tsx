@@ -23,19 +23,31 @@ export default function ImageCarousel({ urls, alt = 'Image' }: ImageCarouselProp
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', borderRadius: '12px' }}>
-      <img 
-        src={urls[currentIndex]} 
-        alt={`${alt} ${currentIndex + 1}`} 
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover',
-          transition: 'opacity 0.3s ease-in-out'
-        }} 
-      />
+      
+      {/* Sliding Filmstrip Container */}
+      <div 
+        style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+          transform: `translateX(-${currentIndex * 100}%)`
+        }}
+      >
+        {urls.map((url, i) => (
+          <img 
+            key={i}
+            src={url} 
+            alt={`${alt} ${i + 1}`} 
+            style={{ 
+              flex: '0 0 100%',
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover',
+            }} 
+          />
+        ))}
+      </div>
 
       {urls.length > 1 && (
         <>
