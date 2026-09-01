@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
+import ImageCarousel from '../ImageCarousel';
 
 export default function AdminImages() {
   const { user } = useAuth();
@@ -37,22 +38,10 @@ export default function AdminImages() {
     setUploading(true);
     
     try {
-      for (let i = 0; i < files.length; i++) {
-        const currentFile = files[i];
-        
-        // Determine the title
-        let finalTitle = title.trim();
-        if (finalTitle) {
-          // If a title was provided and there are multiple files, append a number
-          if (files.length > 1) {
-            finalTitle = `${finalTitle} - ${i + 1}`;
-          }
-        } else {
-          // Fallback to filename without extension
-          finalTitle = currentFile.name.split('.').slice(0, -1).join('.');
-        }
+      const uploadedUrls: string[] = [];
 
-        // Upload image to Supabase Storage
+      // 1. Upload all images to Supabase Storage
+      for (const currentFile of files) {
         const fileExt = currentFile.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
         const filePath = `${fileName}`;
@@ -63,19 +52,27 @@ export default function AdminImages() {
           throw new Error(`Error uploading ${currentFile.name}: ` + uploadError.message);
         }
         
-        // Get the public URL
         const { data: { publicUrl } } = supabase.storage.from('gallery').getPublicUrl(filePath);
-
-        // Insert into database
-        const { error: dbError } = await supabase.from('images').insert([{
-          title: finalTitle, 
-          url: publicUrl, 
-          description, 
-          created_by: user.id
-        }]);
-        
-        if (dbError) throw new Error('Error saving database record: ' + dbError.message);
+        uploadedUrls.push(publicUrl);
       }
+      
+      // Determine the title
+      let finalTitle = title.trim();
+      if (!finalTitle) {
+        // Fallback to the first filename if no title is provided
+        finalTitle = files[0].name.split('.').slice(0, -1).join('.');
+      }
+
+      // 2. Insert ONE record into database with all URLs
+      const { error: dbError } = await supabase.from('images').insert([{
+        title: finalTitle, 
+        url: uploadedUrls[0], // Keep for backward compatibility
+        urls: uploadedUrls, // The new array field
+        description, 
+        created_by: user.id
+      }]);
+      
+      if (dbError) throw new Error('Error saving database record: ' + dbError.message);
       
       // Reset form
       setTitle(''); 
@@ -90,16 +87,22 @@ export default function AdminImages() {
     }
   };
 
-  const handleDelete = async (id: string, url: string) => {
-    if (!confirm('Are you sure you want to delete this image?')) return;
+  const handleDelete = async (id: string, url: string, urls: string[] | null) => {
+    if (!confirm('Are you sure you want to delete this image post?')) return;
     
     try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/');
-      const galleryIndex = pathParts.indexOf('gallery');
-      if (galleryIndex !== -1 && galleryIndex < pathParts.length - 1) {
-        const filePath = pathParts.slice(galleryIndex + 1).join('/');
-        await supabase.storage.from('gallery').remove([filePath]);
+      // Collect all urls to delete
+      const allUrls = urls && urls.length > 0 ? urls : [url];
+      
+      for (const singleUrl of allUrls) {
+        if (!singleUrl) continue;
+        const urlObj = new URL(singleUrl);
+        const pathParts = urlObj.pathname.split('/');
+        const galleryIndex = pathParts.indexOf('gallery');
+        if (galleryIndex !== -1 && galleryIndex < pathParts.length - 1) {
+          const filePath = pathParts.slice(galleryIndex + 1).join('/');
+          await supabase.storage.from('gallery').remove([filePath]);
+        }
       }
     } catch (e) {
       console.warn("Could not delete file from storage.", e);
@@ -143,19 +146,16 @@ export default function AdminImages() {
 
       {isAdding && (
         <form onSubmit={handleAdd} className="glass-panel" style={{ marginBottom: '24px' }}>
-          <h4>Upload New Image(s)</h4>
+          <h4>Upload New Image Post</h4>
           <div className="form-group">
-            <label className="form-label">Base Title (Optional)</label>
+            <label className="form-label">Post Title (Optional)</label>
             <input 
               type="text" 
               className="form-input" 
-              placeholder="e.g. Hackathon 2026" 
+              placeholder="e.g. Hackathon 2026 Gallery" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
             />
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              If left blank, original filenames will be used. If multiple files are selected, titles will be numbered automatically.
-            </p>
           </div>
           <div className="form-group">
             <label className="form-label">Image File(s)</label>
@@ -176,54 +176,59 @@ export default function AdminImages() {
             <label className="form-label">Description (Optional)</label>
             <textarea 
               className="form-input" 
-              placeholder="Applied to all selected images"
               value={description} 
               onChange={e => setDescription(e.target.value)} 
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={uploading || files.length === 0}>
-            {uploading ? `Uploading ${files.length} file(s)...` : `Save ${files.length > 0 ? files.length : ''} Image(s)`}
+            {uploading ? `Uploading ${files.length} file(s)...` : `Save Post (${files.length} images)`}
           </button>
         </form>
       )}
 
       <div className="grid-cards">
-        {images.map(img => (
-          <div key={img.id} className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-            <img src={img.url} alt={img.title} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }} />
-            
-            {editingId === img.id ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  value={editTitle} 
-                  onChange={e => setEditTitle(e.target.value)} 
-                  placeholder="Title"
-                />
-                <textarea 
-                  className="form-input" 
-                  value={editDescription} 
-                  onChange={e => setEditDescription(e.target.value)} 
-                  placeholder="Description"
-                />
-                <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '16px' }}>
-                  <button className="btn btn-primary" style={{ flex: 1, padding: '8px' }} onClick={() => handleEditSubmit(img.id)}>Save</button>
-                  <button className="btn btn-secondary" style={{ flex: 1, padding: '8px' }} onClick={() => setEditingId(null)}>Cancel</button>
-                </div>
+        {images.map(img => {
+          const imageList = img.urls && img.urls.length > 0 ? img.urls : [img.url];
+          
+          return (
+            <div key={img.id} className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: '100%', height: '200px', marginBottom: '16px' }}>
+                <ImageCarousel urls={imageList} alt={img.title} />
               </div>
-            ) : (
-              <>
-                <h4>{img.title}</h4>
-                <p style={{ color: 'var(--text-secondary)', flex: 1 }}>{img.description}</p>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                  <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => handleEditClick(img)}>Edit</button>
-                  <button className="btn btn-secondary" style={{ flex: 1, borderColor: 'var(--error-color)', color: 'var(--error-color)' }} onClick={() => handleDelete(img.id, img.url)}>Delete</button>
+              
+              {editingId === img.id ? (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={editTitle} 
+                    onChange={e => setEditTitle(e.target.value)} 
+                    placeholder="Title"
+                  />
+                  <textarea 
+                    className="form-input" 
+                    value={editDescription} 
+                    onChange={e => setEditDescription(e.target.value)} 
+                    placeholder="Description"
+                  />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '16px' }}>
+                    <button className="btn btn-primary" style={{ flex: 1, padding: '8px' }} onClick={() => handleEditSubmit(img.id)}>Save</button>
+                    <button className="btn btn-secondary" style={{ flex: 1, padding: '8px' }} onClick={() => setEditingId(null)}>Cancel</button>
+                  </div>
                 </div>
-              </>
-            )}
-          </div>
-        ))}
+              ) : (
+                <>
+                  <h4>{img.title}</h4>
+                  <p style={{ color: 'var(--text-secondary)', flex: 1 }}>{img.description}</p>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                    <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => handleEditClick(img)}>Edit</button>
+                    <button className="btn btn-secondary" style={{ flex: 1, borderColor: 'var(--error-color)', color: 'var(--error-color)' }} onClick={() => handleDelete(img.id, img.url, img.urls)}>Delete</button>
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
         {images.length === 0 && !isAdding && <p>No images found.</p>}
       </div>
     </div>

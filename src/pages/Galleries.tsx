@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import ImageCarousel from '../components/ImageCarousel';
 
 export default function Galleries() {
   const [images, setImages] = useState<any[]>([]);
@@ -47,28 +48,23 @@ export default function Galleries() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
           gap: '24px' 
         }}>
-          {images.map(img => (
-            <div key={img.id} className="glass-panel card-hover" style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px', position: 'relative', paddingTop: '75%' }}>
-                <img 
-                  src={img.url} 
-                  alt={img.title} 
-                  style={{ 
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover' 
-                  }} 
-                />
+          {images.map(img => {
+            const imageList = img.urls && img.urls.length > 0 ? img.urls : [img.url];
+            
+            return (
+              <div key={img.id} className="glass-panel card-hover" style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px', position: 'relative', paddingTop: '75%' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                    <ImageCarousel urls={imageList} alt={img.title} />
+                  </div>
+                </div>
+                <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>{img.title}</h3>
+                {img.description && (
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', flex: 1 }}>{img.description}</p>
+                )}
               </div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>{img.title}</h3>
-              {img.description && (
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', flex: 1 }}>{img.description}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div style={{ textAlign: 'center', padding: '64px', color: 'var(--text-secondary)' }}>
