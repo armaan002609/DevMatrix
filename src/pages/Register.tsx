@@ -76,7 +76,7 @@ export default function Register() {
             <input type="text" name="studentId" className="form-input" value={formData.studentId} onChange={handleChange} required />
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div className="form-group">
               <label className="form-label">Branch/Department</label>
               <input type="text" name="branch" className="form-input" value={formData.branch} onChange={handleChange} required />

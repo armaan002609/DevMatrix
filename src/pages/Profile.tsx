@@ -54,7 +54,7 @@ export default function Profile() {
     <div className="animate-fade-in">
       <h2>My Profile</h2>
       <div className="glass-panel" style={{ marginTop: '24px' }}>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap' }}>
           <div style={{ 
             width: '80px', 
             height: '80px', 
@@ -86,7 +86,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
           <div>
             <p className="form-label">Student ID</p>
             <p>{profile.studentId}</p>

@@ -62,7 +62,7 @@ export default function AdminDashboard() {
         <h2>Admin Dashboard</h2>
       </div>
 
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '32px', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '32px', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
         <button 
           className={`btn ${activeTab === 'events' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('events')}

@@ -41,13 +41,13 @@ export default function Home() {
         <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '900px', marginBottom: '40px', fontWeight: 400 }}>
           Our mission is to establish a collaborative software innovation ecosystem where students design, develop, deploy, and maintain real-world software solutions. We are here to foster innovation, drive entrepreneurship, and make meaningful open-source contributions.
         </p>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <button className="btn btn-primary" style={{ padding: '14px 32px' }}>JOIN THE TEAM</button>
-          <button className="btn btn-secondary" style={{ padding: '14px 32px' }}>VIEW PROJECTS</button>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" style={{ padding: '14px 32px', flex: '1 1 auto' }}>JOIN THE TEAM</button>
+          <button className="btn btn-secondary" style={{ padding: '14px 32px', flex: '1 1 auto' }}>VIEW PROJECTS</button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '48px', opacity: 0.6, borderBottom: '1px solid var(--border-color)', paddingBottom: '48px', marginBottom: '48px', overflowX: 'hidden', filter: 'grayscale(100%)' }}>
+      <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap', justifyContent: 'center', opacity: 0.6, borderBottom: '1px solid var(--border-color)', paddingBottom: '48px', marginBottom: '48px', filter: 'grayscale(100%)' }}>
         {/* Placeholder for the logo marquee row */}
         <h3 style={{ margin: 0 }}>SOPHOS</h3>
         <h3 style={{ margin: 0 }}>Canva</h3>
@@ -70,7 +70,7 @@ export default function Home() {
         </div>
 
         {/* Events Side */}
-        <div style={{ flex: '2 1 600px' }}>
+        <div style={{ flex: '2 1 300px' }}>
           {loading ? (
             <p>Loading events...</p>
           ) : events.length === 0 ? (
@@ -80,9 +80,11 @@ export default function Home() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {events.map((event) => (
-                <Link to={`/events/${event.slug}`} key={event.id} className="glass-panel card-hover" style={{ display: 'flex', gap: '24px', textDecoration: 'none' }}>
+                <Link to={`/events/${event.slug}`} key={event.id} className="glass-panel card-hover" style={{ display: 'flex', gap: '24px', textDecoration: 'none', flexWrap: 'wrap' }}>
                   <div style={{ 
                     width: '180px', 
+                    minWidth: '180px',
+                    flexGrow: 1,
                     height: '140px', 
                     backgroundColor: 'rgba(255,255,255,0.05)', 
                     borderRadius: '12px', 

@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -9,6 +11,7 @@ import EventDetail from './pages/EventDetail';
 
 function App() {
   const { user, logout, loading } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (loading) {
     return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading...</div>;
@@ -17,12 +20,13 @@ function App() {
   return (
     <Router>
       <div className="container">
-        <nav className="navbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src="/logo.png" alt="DevMatrix Logo" style={{ height: '64px' }} />
-            </Link>
-            <div className="nav-links" style={{ display: 'flex', gap: '24px' }}>
+        <nav className="navbar" style={{ flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
+              <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <img src="/logo.png" alt="DevMatrix Logo" style={{ height: '64px' }} />
+              </Link>
+              <div className="nav-links hidden-mobile" style={{ display: 'flex', gap: '24px' }}>
               <div className="nav-item">
                 <Link to="/" style={{ color: 'var(--accent-primary)' }}>Events ▾</Link>
                 <div className="mega-menu">
@@ -108,7 +112,9 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="nav-links">
+            </div>
+          </div>
+          <div className="nav-links hidden-mobile">
             {user ? (
               <>
                 {user.role === 'admin' && <Link to="/admin">Admin</Link>}
@@ -123,6 +129,40 @@ function App() {
               </>
             )}
           </div>
+          
+          <button 
+            className="btn btn-secondary show-mobile-flex" 
+            style={{ display: 'none', padding: '8px' }} 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          </div>
+
+          {/* Mobile Menu Dropdown */}
+          {isMobileMenuOpen && (
+            <div className="mobile-menu-container show-mobile-flex" style={{ display: 'none' }}>
+              <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Events</Link>
+              <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Images</Link>
+              <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Videos</Link>
+              <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Blogs</Link>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' }}>
+                {user ? (
+                  <>
+                    {user.role === 'admin' && <Link to="/admin" className="btn btn-secondary" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>}
+                    <Link to="/profile" className="btn btn-secondary" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
+                    <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn btn-secondary">Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="btn btn-secondary" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
+                    <Link to="/register" className="btn btn-primary" onClick={() => setIsMobileMenuOpen(false)}>JOIN THE TEAM</Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </nav>
 
         <main>

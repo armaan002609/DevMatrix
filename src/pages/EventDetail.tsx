@@ -49,7 +49,7 @@ export default function EventDetail() {
       
       <h1>{event.title}</h1>
       
-      <div style={{ display: 'flex', gap: '24px', margin: '24px 0', padding: '24px', backgroundColor: 'var(--bg-card)', borderRadius: '12px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', margin: '24px 0', padding: '24px', backgroundColor: 'var(--bg-card)', borderRadius: '12px' }}>
         <div>
           <p className="form-label">Date</p>
           <p>{new Date(event.date).toLocaleDateString()} {new Date(event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
