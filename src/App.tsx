@@ -34,7 +34,7 @@ function App() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
               <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img src={theme === 'dark' ? '/logo-dark.png' : '/logo.png'} alt="DevMatrix Logo" style={{ height: '64px' }} />
+                <img src="/logo.png" alt="DevMatrix Logo" style={{ height: '64px' }} />
               </Link>
               <div className="nav-links hidden-mobile" style={{ display: 'flex', gap: '24px' }}>
               <div className="nav-item">
@@ -217,7 +217,7 @@ function App() {
         <footer style={{ marginTop: '120px', borderTop: '1px solid var(--border-color)', paddingTop: '64px', paddingBottom: '32px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '48px', marginBottom: '64px' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <img src={theme === 'dark' ? '/logo-dark.png' : '/logo.png'} alt="DevMatrix Logo" style={{ height: '40px', marginBottom: '16px' }} />
+              <img src="/logo.png" alt="DevMatrix Logo" style={{ height: '40px', marginBottom: '16px' }} />
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '300px', lineHeight: '1.6' }}>
                 Building the future of full-stack software development and product engineering.
               </p>
