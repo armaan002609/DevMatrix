@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Color Palette - DevMatrix Logo Inspired */
+  /* Color Palette - DevMatrix Logo Inspired (Light) */
   --bg-main: #fcfbfa;
   --bg-card: #ffffff;
   --text-primary: #2d2d3b;
@@ -23,6 +23,21 @@
   /* Animations */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
+}
+
+[data-theme='dark'] {
+  --bg-main: #0B0E14;
+  --bg-card: #151821;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-heading: #FFFFFF;
+  
+  --accent-primary: #E53935;
+  --accent-primary-hover: #F44336;
+  --accent-secondary: #301719;
+  
+  --border-color: #2A2E39;
+  --glass-bg: rgba(21, 24, 33, 0.8);
 }
 
 * {
@@ -239,6 +254,88 @@ a:hover {
   font-size: 0.9rem;
   opacity: 0.9;
   line-height: 1.4;
+}
+
+/* Profile Dropdown */
+.profile-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-primary);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  transition: transform var(--transition-fast);
+}
+.profile-avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.profile-avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 240px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.98);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+}
+.profile-dropdown-container:hover .profile-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+.dropdown-item:hover {
+  background: var(--bg-main);
+  color: var(--accent-primary);
+}
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
 }
 
 .mega-card-large {

@@ -7,6 +7,9 @@ interface User {
   name: string;
   email: string;
   role: 'member' | 'admin';
+  avatar_url?: string;
+  linkedin_id?: string;
+  github_id?: string;
 }
 
 interface AuthContextType {
@@ -33,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('id, name, email, role')
+          .select('id, name, email, role, avatar_url, linkedin_id, github_id')
           .eq('id', session.user.id)
           .single();
 
@@ -42,7 +45,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         
         if (data) {
-          setUser({ id: data.id, name: data.name, email: data.email, role: data.role as 'member' | 'admin' });
+          setUser({ 
+            id: data.id, 
+            name: data.name, 
+            email: data.email, 
+            role: data.role as 'member' | 'admin',
+            avatar_url: data.avatar_url,
+            linkedin_id: data.linkedin_id,
+            github_id: data.github_id
+          });
         } else {
           // Fallback if users table row doesn't exist yet
           setUser({

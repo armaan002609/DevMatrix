@@ -160,3 +160,9 @@ CREATE POLICY "Anyone can view published blogs" ON public.blogs FOR SELECT USING
 CREATE POLICY "Admins can manage blogs" ON public.blogs FOR ALL USING (
   EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
 );
+
+-- Add new profile fields
+ALTER TABLE public.users 
+ADD COLUMN IF NOT EXISTS avatar_url TEXT,
+ADD COLUMN IF NOT EXISTS linkedin_id TEXT,
+ADD COLUMN IF NOT EXISTS github_id TEXT;

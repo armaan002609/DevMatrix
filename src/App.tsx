@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, Moon, Sun, User as UserIcon, LogOut, Settings } from 'lucide-react';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -12,6 +12,16 @@ import EventDetail from './pages/EventDetail';
 function App() {
   const { user, logout, loading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   if (loading) {
     return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading...</div>;
@@ -114,11 +124,38 @@ function App() {
           </div>
           <div className="nav-links hidden-mobile">
             {user ? (
-              <>
-                {user.role === 'admin' && <Link to="/admin">Admin</Link>}
-                <Link to="/profile">Profile</Link>
-                <button onClick={logout} className="btn btn-secondary">Logout</button>
-              </>
+              <div className="profile-dropdown-container">
+                <button className="profile-avatar-btn">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt="Profile" />
+                  ) : (
+                    user.name?.charAt(0) || <UserIcon size={20} />
+                  )}
+                </button>
+                <div className="profile-dropdown-menu">
+                  <div style={{ padding: '8px 16px', marginBottom: '4px' }}>
+                    <p style={{ fontWeight: 600, color: 'var(--text-heading)' }}>{user.name}</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{user.email}</p>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  
+                  {user.role === 'admin' && (
+                    <Link to="/admin" className="dropdown-item">
+                      <Settings size={18} /> Admin Dashboard
+                    </Link>
+                  )}
+                  <Link to="/profile" className="dropdown-item">
+                    <UserIcon size={18} /> Edit Profile
+                  </Link>
+                  <button onClick={toggleTheme} className="dropdown-item">
+                    {theme === 'light' ? <><Moon size={18} /> Dark Mode</> : <><Sun size={18} /> Light Mode</>}
+                  </button>
+                  <div className="dropdown-divider"></div>
+                  <button onClick={logout} className="dropdown-item" style={{ color: 'var(--accent-primary)' }}>
+                    <LogOut size={18} /> Logout
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
                 <Link to="/login" style={{ fontWeight: 600 }}>Log in</Link>
@@ -150,7 +187,10 @@ function App() {
                   <>
                     {user.role === 'admin' && <Link to="/admin" className="btn btn-secondary" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>}
                     <Link to="/profile" className="btn btn-secondary" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
-                    <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn btn-secondary">Logout</button>
+                    <button onClick={toggleTheme} className="btn btn-secondary">
+                      {theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+                    </button>
+                    <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn btn-secondary" style={{ color: 'var(--accent-primary)' }}>Logout</button>
                   </>
                 ) : (
                   <>

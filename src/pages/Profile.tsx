@@ -9,7 +9,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: '', studentId: '', branch: '', yearOfStudy: ''
+    name: '', studentId: '', branch: '', yearOfStudy: '', avatarUrl: '', linkedinId: '', githubId: ''
   });
 
   useEffect(() => {
@@ -40,6 +40,9 @@ export default function Profile() {
           studentId: data.student_id,
           yearOfStudy: data.year_of_study,
           membershipStatus: data.membership_status,
+          avatarUrl: data.avatar_url,
+          linkedinId: data.linkedin_id,
+          githubId: data.github_id,
           registeredEvents: data.event_registrations?.map((er: any) => er.events) || []
         };
         setProfile(mappedProfile);
@@ -47,7 +50,10 @@ export default function Profile() {
           name: data.name,
           studentId: data.student_id,
           branch: data.branch,
-          yearOfStudy: data.year_of_study
+          yearOfStudy: data.year_of_study,
+          avatarUrl: data.avatar_url || '',
+          linkedinId: data.linkedin_id || '',
+          githubId: data.github_id || ''
         });
       }
     } finally {
@@ -67,7 +73,10 @@ export default function Profile() {
         name: editForm.name,
         student_id: editForm.studentId,
         branch: editForm.branch,
-        year_of_study: parseInt(editForm.yearOfStudy)
+        year_of_study: parseInt(editForm.yearOfStudy),
+        avatar_url: editForm.avatarUrl,
+        linkedin_id: editForm.linkedinId,
+        github_id: editForm.githubId
       }]);
       if (error) alert('Error creating profile: ' + error.message);
       else { setIsEditing(false); fetchProfile(); }
@@ -78,7 +87,10 @@ export default function Profile() {
       name: editForm.name,
       student_id: editForm.studentId,
       branch: editForm.branch,
-      year_of_study: parseInt(editForm.yearOfStudy)
+      year_of_study: parseInt(editForm.yearOfStudy),
+      avatar_url: editForm.avatarUrl,
+      linkedin_id: editForm.linkedinId,
+      github_id: editForm.githubId
     }).eq('id', user.id);
 
     if (error) {
@@ -117,6 +129,18 @@ export default function Profile() {
             <label className="form-label">Year of Study</label>
             <input type="number" className="form-input" min="1" max="6" value={editForm.yearOfStudy} onChange={e => setEditForm({...editForm, yearOfStudy: e.target.value})} required />
           </div>
+          <div className="form-group">
+            <label className="form-label">Profile Picture URL</label>
+            <input type="url" className="form-input" placeholder="https://example.com/avatar.jpg" value={editForm.avatarUrl} onChange={e => setEditForm({...editForm, avatarUrl: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">LinkedIn ID</label>
+            <input type="text" className="form-input" placeholder="in/username" value={editForm.linkedinId} onChange={e => setEditForm({...editForm, linkedinId: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">GitHub ID</label>
+            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => setEditForm({...editForm, githubId: e.target.value})} />
+          </div>
           <button type="submit" className="btn btn-primary">Save Profile</button>
         </form>
       </div>
@@ -150,6 +174,18 @@ export default function Profile() {
             <label className="form-label">Year of Study</label>
             <input type="number" className="form-input" min="1" max="6" value={editForm.yearOfStudy} onChange={e => setEditForm({...editForm, yearOfStudy: e.target.value})} required />
           </div>
+          <div className="form-group">
+            <label className="form-label">Profile Picture URL</label>
+            <input type="url" className="form-input" placeholder="https://example.com/avatar.jpg" value={editForm.avatarUrl} onChange={e => setEditForm({...editForm, avatarUrl: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">LinkedIn ID</label>
+            <input type="text" className="form-input" placeholder="in/username" value={editForm.linkedinId} onChange={e => setEditForm({...editForm, linkedinId: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">GitHub ID</label>
+            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => setEditForm({...editForm, githubId: e.target.value})} />
+          </div>
           <button type="submit" className="btn btn-primary">Save Changes</button>
         </form>
       ) : (
@@ -165,9 +201,14 @@ export default function Profile() {
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '2rem',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              overflow: 'hidden'
             }}>
-              {profile?.name?.charAt(0) || '?'}
+              {profile?.avatarUrl ? (
+                <img src={profile.avatarUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                profile?.name?.charAt(0) || '?'
+              )}
             </div>
             <div>
               <h3>{profile?.name}</h3>
@@ -203,6 +244,17 @@ export default function Profile() {
             <div>
               <p className="form-label">Branch & Year</p>
               <p>{profile?.branch} • Year {profile?.yearOfStudy}</p>
+            </div>
+            <div>
+              <p className="form-label">Social Links</p>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                {profile?.linkedinId ? (
+                  <a href={`https://linkedin.com/in/${profile.linkedinId.replace('in/', '')}`} target="_blank" rel="noreferrer">LinkedIn</a>
+                ) : <span style={{ color: 'var(--text-secondary)' }}>No LinkedIn</span>}
+                {profile?.githubId ? (
+                  <a href={`https://github.com/${profile.githubId}`} target="_blank" rel="noreferrer">GitHub</a>
+                ) : <span style={{ color: 'var(--text-secondary)' }}>No GitHub</span>}
+              </div>
             </div>
           </div>
         </div>
