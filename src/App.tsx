@@ -112,8 +112,6 @@ function App() {
               </div>
             </div>
           </div>
-            </div>
-          </div>
           <div className="nav-links hidden-mobile">
             {user ? (
               <>
