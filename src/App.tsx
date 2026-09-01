@@ -30,99 +30,113 @@ function App() {
   return (
     <Router>
       <div className="container">
-        <nav className="navbar" style={{ flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
-              <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img src="/logo.png" alt="DevMatrix Logo" style={{ height: '64px' }} />
-              </Link>
-              <div className="nav-links hidden-mobile" style={{ display: 'flex', gap: '24px' }}>
-              <div className="nav-item">
-                <Link to="/" style={{ color: 'var(--accent-primary)' }}>Events ▾</Link>
-                <div className="mega-menu">
-                  <Link to="/" className="mega-card mega-card-large">
-                    <h3>Hackathons</h3>
-                    <p>Join our massive weekend events and build the future.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Workshops</h3>
-                    <p>Learn new skills from industry experts.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Socials</h3>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-light">
-                    <h3>Upcoming Calendar</h3>
-                    <p>View all scheduled events for this semester.</p>
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="nav-item">
-                <Link to="/">Images ▾</Link>
-                <div className="mega-menu" style={{ left: '-300px' }}>
-                  <Link to="/" className="mega-card mega-card-large">
-                    <h3>Event Galleries</h3>
-                    <p>Browse through high-quality photos from past events.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Member Spotlights</h3>
-                    <p>See our community in action.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Projects</h3>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-light">
-                    <h3>Submit Media</h3>
-                    <p>Have photos to share? Upload them here.</p>
-                  </Link>
-                </div>
-              </div>
+        <nav className="navbar" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 0', marginBottom: '64px' }}>
+          {/* Left: Logo */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', zIndex: 10 }}>
+            <img 
+              src={theme === 'dark' ? '/logo-dark.png' : '/logo.png'} 
+              alt="DevMatrix Logo" 
+              style={{ height: '48px', objectFit: 'contain' }} 
+              onError={(e) => {
+                // Fallback to light mode logo if dark mode logo is missing
+                (e.target as HTMLImageElement).src = '/logo.png';
+                // Try applying CSS invert if they want dark mode
+                if (theme === 'dark') {
+                  (e.target as HTMLImageElement).style.filter = 'brightness(0) invert(1)';
+                }
+              }}
+            />
+          </Link>
 
-              <div className="nav-item">
-                <Link to="/">Videos ▾</Link>
-                <div className="mega-menu" style={{ left: '-400px' }}>
-                  <Link to="/" className="mega-card mega-card-large">
-                    <h3>Tech Talks</h3>
-                    <p>Watch recordings of our guest speakers and panels.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Tutorials</h3>
-                    <p>Step-by-step video guides.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Shorts</h3>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-light">
-                    <h3>YouTube Channel</h3>
-                    <p>Subscribe for the latest updates.</p>
-                  </Link>
-                </div>
+          {/* Center: Navigation Links */}
+          <div className="nav-links hidden-mobile" style={{ display: 'flex', gap: '32px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 5 }}>
+            <div className="nav-item">
+              <Link to="/" style={{ color: 'var(--text-primary)' }}>Events ▾</Link>
+              <div className="mega-menu">
+                <Link to="/" className="mega-card mega-card-large">
+                  <h3>Hackathons</h3>
+                  <p>Join our massive weekend events and build the future.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Workshops</h3>
+                  <p>Learn new skills from industry experts.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Socials</h3>
+                </Link>
+                <Link to="/" className="mega-card mega-card-light">
+                  <h3>Upcoming Calendar</h3>
+                  <p>View all scheduled events for this semester.</p>
+                </Link>
               </div>
+            </div>
+            
+            <div className="nav-item">
+              <Link to="/" style={{ color: 'var(--text-primary)' }}>Images ▾</Link>
+              <div className="mega-menu" style={{ left: '-300px' }}>
+                <Link to="/" className="mega-card mega-card-large">
+                  <h3>Event Galleries</h3>
+                  <p>Browse through high-quality photos from past events.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Member Spotlights</h3>
+                  <p>See our community in action.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Projects</h3>
+                </Link>
+                <Link to="/" className="mega-card mega-card-light">
+                  <h3>Submit Media</h3>
+                  <p>Have photos to share? Upload them here.</p>
+                </Link>
+              </div>
+            </div>
 
-              <div className="nav-item">
-                <Link to="/">Blogs ▾</Link>
-                <div className="mega-menu" style={{ left: '-500px' }}>
-                  <Link to="/" className="mega-card mega-card-large">
-                    <h3>Engineering Blog</h3>
-                    <p>Deep dives into the architecture and software we build.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Articles</h3>
-                    <p>Thoughts and insights.</p>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-small">
-                    <h3>Community News</h3>
-                  </Link>
-                  <Link to="/" className="mega-card mega-card-light">
-                    <h3>Write for Us</h3>
-                    <p>Share your knowledge with the community.</p>
-                  </Link>
-                </div>
+            <div className="nav-item">
+              <Link to="/" style={{ color: 'var(--text-primary)' }}>Videos ▾</Link>
+              <div className="mega-menu" style={{ left: '-400px' }}>
+                <Link to="/" className="mega-card mega-card-large">
+                  <h3>Tech Talks</h3>
+                  <p>Watch recordings of our guest speakers and panels.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Tutorials</h3>
+                  <p>Step-by-step video guides.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Shorts</h3>
+                </Link>
+                <Link to="/" className="mega-card mega-card-light">
+                  <h3>YouTube Channel</h3>
+                  <p>Subscribe for the latest updates.</p>
+                </Link>
+              </div>
+            </div>
+
+            <div className="nav-item">
+              <Link to="/" style={{ color: 'var(--text-primary)' }}>Blogs ▾</Link>
+              <div className="mega-menu" style={{ left: '-500px' }}>
+                <Link to="/" className="mega-card mega-card-large">
+                  <h3>Engineering Blog</h3>
+                  <p>Deep dives into the architecture and software we build.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Articles</h3>
+                  <p>Thoughts and insights.</p>
+                </Link>
+                <Link to="/" className="mega-card mega-card-small">
+                  <h3>Community News</h3>
+                </Link>
+                <Link to="/" className="mega-card mega-card-light">
+                  <h3>Write for Us</h3>
+                  <p>Share your knowledge with the community.</p>
+                </Link>
               </div>
             </div>
           </div>
-          <div className="nav-links hidden-mobile">
+
+          {/* Right: Auth / Profile */}
+          <div className="nav-links hidden-mobile" style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 10 }}>
             {user ? (
               <div className="profile-dropdown-container">
                 <button className="profile-avatar-btn">
@@ -158,21 +172,20 @@ function App() {
               </div>
             ) : (
               <>
-                <Link to="/login" style={{ fontWeight: 600 }}>Log in</Link>
-                <Link to="/register" style={{ fontWeight: 600 }}>Sign up</Link>
-                <Link to="/register" className="btn btn-primary">JOIN THE TEAM</Link>
+                <Link to="/login" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Log in</Link>
+                <Link to="/register" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Sign up</Link>
+                <Link to="/register" className="btn btn-primary" style={{ marginLeft: '12px' }}>JOIN THE TEAM</Link>
               </>
             )}
           </div>
           
           <button 
             className="btn btn-secondary show-mobile-flex" 
-            style={{ display: 'none', padding: '8px' }} 
+            style={{ display: 'none', padding: '8px', zIndex: 10 }} 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          </div>
 
           {/* Mobile Menu Dropdown */}
           {isMobileMenuOpen && (
