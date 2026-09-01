@@ -255,10 +255,10 @@ export default function Profile() {
               <p className="form-label">Social Links</p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 {profile?.linkedinId ? (
-                  <a href={`https://linkedin.com/in/${profile.linkedinId.replace('in/', '')}`} target="_blank" rel="noreferrer">LinkedIn</a>
+                  <a href={profile.linkedinId.startsWith('http') ? profile.linkedinId : `https://linkedin.com/in/${profile.linkedinId.replace('in/', '')}`} target="_blank" rel="noreferrer">LinkedIn</a>
                 ) : <span style={{ color: 'var(--text-secondary)' }}>No LinkedIn</span>}
                 {profile?.githubId ? (
-                  <a href={`https://github.com/${profile.githubId}`} target="_blank" rel="noreferrer">GitHub</a>
+                  <a href={profile.githubId.startsWith('http') ? profile.githubId : `https://github.com/${profile.githubId}`} target="_blank" rel="noreferrer">GitHub</a>
                 ) : <span style={{ color: 'var(--text-secondary)' }}>No GitHub</span>}
               </div>
             </div>
