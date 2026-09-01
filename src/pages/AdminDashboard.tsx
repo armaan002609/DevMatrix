@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import AdminEvents from '../components/admin/AdminEvents';
+import AdminImages from '../components/admin/AdminImages';
+import AdminVideos from '../components/admin/AdminVideos';
+import AdminBlogs from '../components/admin/AdminBlogs';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<'events' | 'members'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'images' | 'videos' | 'blogs' | 'members'>('events');
   const [members, setMembers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export default function AdminDashboard() {
         ].join(","));
       }
 
-      const blob = new Blob([csvRows.join("\\n")], { type: 'text/csv' });
+      const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -63,31 +67,17 @@ export default function AdminDashboard() {
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '32px', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
-        <button 
-          className={`btn ${activeTab === 'events' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveTab('events')}
-        >
-          Events
-        </button>
-        <button 
-          className={`btn ${activeTab === 'members' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveTab('members')}
-        >
-          Members
-        </button>
+        <button className={`btn ${activeTab === 'events' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('events')}>Events</button>
+        <button className={`btn ${activeTab === 'images' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('images')}>Images</button>
+        <button className={`btn ${activeTab === 'videos' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('videos')}>Videos</button>
+        <button className={`btn ${activeTab === 'blogs' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('blogs')}>Blogs</button>
+        <button className={`btn ${activeTab === 'members' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab('members')}>Members</button>
       </div>
 
-      {activeTab === 'events' && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3>Manage Events</h3>
-            <button className="btn btn-primary">+ New Event</button>
-          </div>
-          <div className="glass-panel">
-            <p style={{ color: 'var(--text-secondary)' }}>Event management form goes here (Create/Edit).</p>
-          </div>
-        </div>
-      )}
+      {activeTab === 'events' && <AdminEvents />}
+      {activeTab === 'images' && <AdminImages />}
+      {activeTab === 'videos' && <AdminVideos />}
+      {activeTab === 'blogs' && <AdminBlogs />}
 
       {activeTab === 'members' && (
         <div>

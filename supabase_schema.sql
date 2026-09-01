@@ -104,3 +104,59 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- Create Images table
+CREATE TABLE public.images (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  description TEXT,
+  created_by UUID REFERENCES public.users(id) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Create Videos table
+CREATE TABLE public.videos (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  youtube_url TEXT NOT NULL,
+  description TEXT,
+  created_by UUID REFERENCES public.users(id) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Create Blogs table
+CREATE TABLE public.blogs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  content TEXT NOT NULL,
+  cover_image_url TEXT,
+  status event_status DEFAULT 'draft' NOT NULL,
+  created_by UUID REFERENCES public.users(id) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
+
+-- Policies for Images
+CREATE POLICY "Anyone can view images" ON public.images FOR SELECT USING (true);
+CREATE POLICY "Admins can manage images" ON public.images FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
+-- Policies for Videos
+CREATE POLICY "Anyone can view videos" ON public.videos FOR SELECT USING (true);
+CREATE POLICY "Admins can manage videos" ON public.videos FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
+
+-- Policies for Blogs
+CREATE POLICY "Anyone can view published blogs" ON public.blogs FOR SELECT USING (status = 'published');
+CREATE POLICY "Admins can manage blogs" ON public.blogs FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+);
