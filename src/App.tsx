@@ -126,12 +126,18 @@ function App() {
           <div className="nav-links hidden-mobile">
             {user ? (
               <div className="profile-dropdown-container">
-                <button className="profile-avatar-btn">
-                  {user.avatar_url ? (
-                    <img src={user.avatar_url} alt="Profile" />
-                  ) : (
-                    user.name?.charAt(0) || <UserIcon size={20} />
-                  )}
+                <button className="profile-avatar-btn" style={{ textAlign: 'right' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: '1.2' }}>{user.name}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.2', textTransform: 'capitalize' }}>{user.role}</span>
+                  </div>
+                  <div className="profile-avatar-img">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="Profile" />
+                    ) : (
+                      <span style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '1.1rem' }}>{user.name?.charAt(0) || <UserIcon size={20} />}</span>
+                    )}
+                  </div>
                 </button>
                 <div className="profile-dropdown-menu">
                   <div style={{ padding: '8px 16px', marginBottom: '4px' }}>
