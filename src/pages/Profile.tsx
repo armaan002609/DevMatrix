@@ -9,7 +9,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: '', studentId: '', branch: '', yearOfStudy: '', avatarUrl: '', linkedinId: '', githubId: ''
+    name: '', branch: '', yearOfStudy: '', avatarUrl: '', linkedinId: '', githubId: ''
   });
 
   useEffect(() => {
@@ -37,7 +37,6 @@ export default function Profile() {
       } else if (data) {
         const mappedProfile = {
           ...data,
-          studentId: data.student_id,
           yearOfStudy: data.year_of_study,
           membershipStatus: data.membership_status,
           avatarUrl: data.avatar_url,
@@ -47,10 +46,9 @@ export default function Profile() {
         };
         setProfile(mappedProfile);
         setEditForm({
-          name: data.name,
-          studentId: data.student_id,
-          branch: data.branch,
-          yearOfStudy: data.year_of_study,
+          name: data.name || '',
+          branch: data.branch || '',
+          yearOfStudy: data.year_of_study || '',
           avatarUrl: data.avatar_url || '',
           linkedinId: data.linkedin_id || '',
           githubId: data.github_id || ''
@@ -65,36 +63,22 @@ export default function Profile() {
     e.preventDefault();
     if (!user) return;
     
-    // Ensure the users row exists if it was missing for some reason
-    if (!profile) {
-      const { error } = await supabase.from('users').insert([{
-        id: user.id,
-        email: user.email,
-        name: editForm.name,
-        student_id: editForm.studentId,
-        branch: editForm.branch,
-        year_of_study: parseInt(editForm.yearOfStudy),
-        avatar_url: editForm.avatarUrl,
-        linkedin_id: editForm.linkedinId,
-        github_id: editForm.githubId
-      }]);
-      if (error) alert('Error creating profile: ' + error.message);
-      else { setIsEditing(false); fetchProfile(); }
-      return;
-    }
-
-    const { error } = await supabase.from('users').update({
+    const profileData = {
+      id: user.id,
+      email: user.email,
       name: editForm.name,
-      student_id: editForm.studentId,
+      student_id: user.email, // default to email to satisfy DB not-null constraint
       branch: editForm.branch,
-      year_of_study: parseInt(editForm.yearOfStudy),
+      year_of_study: parseInt(editForm.yearOfStudy) || 1,
       avatar_url: editForm.avatarUrl,
       linkedin_id: editForm.linkedinId,
       github_id: editForm.githubId
-    }).eq('id', user.id);
+    };
+
+    const { error } = await supabase.from('users').upsert(profileData);
 
     if (error) {
-      alert('Error updating profile: ' + error.message);
+      alert('Error saving profile: ' + error.message);
     } else {
       setIsEditing(false);
       fetchProfile();
@@ -118,8 +102,8 @@ export default function Profile() {
             <input type="text" className="form-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Student ID</label>
-            <input type="text" className="form-input" value={editForm.studentId} onChange={e => setEditForm({...editForm, studentId: e.target.value})} required />
+            <label className="form-label">Email ID</label>
+            <input type="email" className="form-input" value={user.email} disabled />
           </div>
           <div className="form-group">
             <label className="form-label">Branch</label>
@@ -139,14 +123,15 @@ export default function Profile() {
           </div>
           <div className="form-group">
             <label className="form-label">GitHub ID</label>
-            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => {
+            <input type="text" className="form-input" placeholder="username or link" value={editForm.githubId} onChange={e => {
               const val = e.target.value;
+              const cleanUsername = val.replace('https://github.com/', '').replace('/', '');
               setEditForm(prev => {
                 const shouldUpdateAvatar = !prev.avatarUrl || prev.avatarUrl.startsWith('https://github.com/');
                 return {
                   ...prev,
                   githubId: val,
-                  avatarUrl: shouldUpdateAvatar && val ? `https://github.com/${val}.png` : prev.avatarUrl
+                  avatarUrl: shouldUpdateAvatar && cleanUsername ? `https://github.com/${cleanUsername}.png` : prev.avatarUrl
                 };
               });
             }} />
@@ -173,8 +158,8 @@ export default function Profile() {
             <input type="text" className="form-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Student ID</label>
-            <input type="text" className="form-input" value={editForm.studentId} onChange={e => setEditForm({...editForm, studentId: e.target.value})} required />
+            <label className="form-label">Email ID</label>
+            <input type="email" className="form-input" value={user.email} disabled />
           </div>
           <div className="form-group">
             <label className="form-label">Branch</label>
@@ -194,14 +179,15 @@ export default function Profile() {
           </div>
           <div className="form-group">
             <label className="form-label">GitHub ID</label>
-            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => {
+            <input type="text" className="form-input" placeholder="username or link" value={editForm.githubId} onChange={e => {
               const val = e.target.value;
+              const cleanUsername = val.replace('https://github.com/', '').replace('/', '');
               setEditForm(prev => {
                 const shouldUpdateAvatar = !prev.avatarUrl || prev.avatarUrl.startsWith('https://github.com/');
                 return {
                   ...prev,
                   githubId: val,
-                  avatarUrl: shouldUpdateAvatar && val ? `https://github.com/${val}.png` : prev.avatarUrl
+                  avatarUrl: shouldUpdateAvatar && cleanUsername ? `https://github.com/${cleanUsername}.png` : prev.avatarUrl
                 };
               });
             }} />
@@ -258,8 +244,8 @@ export default function Profile() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
             <div>
-              <p className="form-label">Student ID</p>
-              <p>{profile?.studentId}</p>
+              <p className="form-label">Email ID</p>
+              <p>{profile?.email}</p>
             </div>
             <div>
               <p className="form-label">Branch & Year</p>
