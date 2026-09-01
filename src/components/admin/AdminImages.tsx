@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import ImageCarousel from '../ImageCarousel';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Calendar, User as UserIcon } from 'lucide-react';
 
 export default function AdminImages() {
   const { user } = useAuth();
@@ -15,12 +15,23 @@ export default function AdminImages() {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [description, setDescription] = useState('');
+  
+  // New Upload Metadata
+  const [eventDate, setEventDate] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestDesignation, setGuestDesignation] = useState('');
+  
   const [uploading, setUploading] = useState(false);
 
   // Edit State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editEventDate, setEditEventDate] = useState('');
+  const [editEventTime, setEditEventTime] = useState('');
+  const [editGuestName, setEditGuestName] = useState('');
+  const [editGuestDesignation, setEditGuestDesignation] = useState('');
 
   useEffect(() => {
     fetchImages();
@@ -96,12 +107,16 @@ export default function AdminImages() {
         finalTitle = files[0].name.split('.').slice(0, -1).join('.');
       }
 
-      // 2. Insert ONE record into database with all URLs
+      // 2. Insert ONE record into database with all URLs and Metadata
       const { error: dbError } = await supabase.from('images').insert([{
         title: finalTitle, 
         url: uploadedUrls[0], // Keep for backward compatibility
         urls: uploadedUrls, // The new array field
         description, 
+        event_date: eventDate || null,
+        event_time: eventTime || null,
+        guest_name: guestName || null,
+        guest_designation: guestDesignation || null,
         created_by: user.id
       }]);
       
@@ -111,6 +126,10 @@ export default function AdminImages() {
       setTitle(''); 
       setFiles([]); 
       setDescription(''); 
+      setEventDate('');
+      setEventTime('');
+      setGuestName('');
+      setGuestDesignation('');
       setIsAdding(false);
       fetchImages();
     } catch (err: any) {
@@ -148,14 +167,22 @@ export default function AdminImages() {
 
   const handleEditClick = (img: any) => {
     setEditingId(img.id);
-    setEditTitle(img.title);
+    setEditTitle(img.title || '');
     setEditDescription(img.description || '');
+    setEditEventDate(img.event_date || '');
+    setEditEventTime(img.event_time || '');
+    setEditGuestName(img.guest_name || '');
+    setEditGuestDesignation(img.guest_designation || '');
   };
 
   const handleEditSubmit = async (id: string) => {
     const { error } = await supabase.from('images').update({
       title: editTitle,
-      description: editDescription
+      description: editDescription,
+      event_date: editEventDate || null,
+      event_time: editEventTime || null,
+      guest_name: editGuestName || null,
+      guest_designation: editGuestDesignation || null,
     }).eq('id', id);
 
     if (error) {
@@ -199,8 +226,6 @@ export default function AdminImages() {
               multiple
               onChange={e => {
                 if (e.target.files) {
-                  // Append new files instead of replacing entirely if they select more,
-                  // or just replace. Let's just replace as per standard input=file behavior.
                   setFiles(Array.from(e.target.files));
                 }
               }} 
@@ -249,6 +274,50 @@ export default function AdminImages() {
             </div>
           )}
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label className="form-label">Event Date (Optional)</label>
+              <input 
+                type="date" 
+                className="form-input" 
+                value={eventDate} 
+                onChange={e => setEventDate(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Event Time (Optional)</label>
+              <input 
+                type="time" 
+                className="form-input" 
+                value={eventTime} 
+                onChange={e => setEventTime(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-group">
+              <label className="form-label">Guest Name (Optional)</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="e.g. John Doe"
+                value={guestName} 
+                onChange={e => setGuestName(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Guest Designation (Optional)</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="e.g. Senior SWE @ Google"
+                value={guestDesignation} 
+                onChange={e => setGuestDesignation(e.target.value)} 
+              />
+            </div>
+          </div>
+
           <div className="form-group">
             <label className="form-label">Description (Optional)</label>
             <textarea 
@@ -282,6 +351,14 @@ export default function AdminImages() {
                     onChange={e => setEditTitle(e.target.value)} 
                     placeholder="Title"
                   />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input type="date" className="form-input" value={editEventDate} onChange={e => setEditEventDate(e.target.value)} />
+                    <input type="time" className="form-input" value={editEventTime} onChange={e => setEditEventTime(e.target.value)} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input type="text" className="form-input" value={editGuestName} onChange={e => setEditGuestName(e.target.value)} placeholder="Guest Name" />
+                    <input type="text" className="form-input" value={editGuestDesignation} onChange={e => setEditGuestDesignation(e.target.value)} placeholder="Designation" />
+                  </div>
                   <textarea 
                     className="form-input" 
                     value={editDescription} 
@@ -296,7 +373,28 @@ export default function AdminImages() {
               ) : (
                 <>
                   <h4>{img.title}</h4>
+                  
+                  {/* Metadata display */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '8px', marginBottom: '8px' }}>
+                    {(img.event_date || img.event_time) && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        <Calendar size={14} /> 
+                        {img.event_date ? new Date(img.event_date).toLocaleDateString() : ''}
+                        {img.event_date && img.event_time ? ' at ' : ''}
+                        {img.event_time ? img.event_time.substring(0, 5) : ''}
+                      </span>
+                    )}
+                    {(img.guest_name) && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        <UserIcon size={14} /> 
+                        {img.guest_name}
+                        {img.guest_designation ? ` - ${img.guest_designation}` : ''}
+                      </span>
+                    )}
+                  </div>
+
                   <p style={{ color: 'var(--text-secondary)', flex: 1 }}>{img.description}</p>
+                  
                   <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                     <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => handleEditClick(img)}>Edit</button>
                     <button className="btn btn-secondary" style={{ flex: 1, borderColor: 'var(--error-color)', color: 'var(--error-color)' }} onClick={() => handleDelete(img.id, img.url, img.urls)}>Delete</button>
