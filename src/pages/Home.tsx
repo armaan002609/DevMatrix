@@ -42,8 +42,8 @@ export default function Home() {
           Our mission is to establish a collaborative software innovation ecosystem where students design, develop, deploy, and maintain real-world software solutions. We are here to foster innovation, drive entrepreneurship, and make meaningful open-source contributions.
         </p>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" style={{ padding: '14px 32px', flex: '1 1 auto' }}>JOIN THE TEAM</button>
-          <button className="btn btn-secondary" style={{ padding: '14px 32px', flex: '1 1 auto' }}>VIEW PROJECTS</button>
+          <button className="btn btn-primary" style={{ padding: '14px 32px' }}>JOIN THE TEAM</button>
+          <button className="btn btn-secondary" style={{ padding: '14px 32px' }}>VIEW PROJECTS</button>
         </div>
       </div>
 
