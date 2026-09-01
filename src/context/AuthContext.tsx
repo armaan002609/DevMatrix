@@ -10,7 +10,6 @@ interface User {
   avatar_url?: string;
   linkedin_id?: string;
   github_id?: string;
-  community_designation?: string;
 }
 
 interface AuthContextType {
@@ -37,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('id, name, email, role, avatar_url, linkedin_id, github_id, community_designation')
+        .select('id, name, email, role, avatar_url, linkedin_id, github_id')
         .eq('id', session.user.id)
         .single();
 
@@ -53,8 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           role: data.role as 'member' | 'admin',
           avatar_url: data.avatar_url,
           linkedin_id: data.linkedin_id,
-          github_id: data.github_id,
-          community_designation: data.community_designation
+          github_id: data.github_id
         });
       } else {
         // Fallback if users table row doesn't exist yet

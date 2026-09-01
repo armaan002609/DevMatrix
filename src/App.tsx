@@ -129,7 +129,7 @@ function App() {
                 <button className="profile-avatar-btn" style={{ textAlign: 'right' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: '1.2' }}>{user.name}</span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.2', textTransform: 'capitalize' }}>{user.community_designation || user.role}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.2', textTransform: 'capitalize' }}>{user.role}</span>
                   </div>
                   <div className="profile-avatar-img">
                     {user.avatar_url ? (
