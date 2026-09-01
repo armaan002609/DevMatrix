@@ -139,7 +139,17 @@ export default function Profile() {
           </div>
           <div className="form-group">
             <label className="form-label">GitHub ID</label>
-            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => setEditForm({...editForm, githubId: e.target.value})} />
+            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => {
+              const val = e.target.value;
+              setEditForm(prev => {
+                const shouldUpdateAvatar = !prev.avatarUrl || prev.avatarUrl.startsWith('https://github.com/');
+                return {
+                  ...prev,
+                  githubId: val,
+                  avatarUrl: shouldUpdateAvatar && val ? `https://github.com/${val}.png` : prev.avatarUrl
+                };
+              });
+            }} />
           </div>
           <button type="submit" className="btn btn-primary">Save Profile</button>
         </form>
@@ -184,7 +194,17 @@ export default function Profile() {
           </div>
           <div className="form-group">
             <label className="form-label">GitHub ID</label>
-            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => setEditForm({...editForm, githubId: e.target.value})} />
+            <input type="text" className="form-input" placeholder="username" value={editForm.githubId} onChange={e => {
+              const val = e.target.value;
+              setEditForm(prev => {
+                const shouldUpdateAvatar = !prev.avatarUrl || prev.avatarUrl.startsWith('https://github.com/');
+                return {
+                  ...prev,
+                  githubId: val,
+                  avatarUrl: shouldUpdateAvatar && val ? `https://github.com/${val}.png` : prev.avatarUrl
+                };
+              });
+            }} />
           </div>
           <button type="submit" className="btn btn-primary">Save Changes</button>
         </form>
