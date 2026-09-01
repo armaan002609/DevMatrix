@@ -5,6 +5,7 @@ import type { Session } from '@supabase/supabase-js';
 interface User {
   id: string;
   name: string;
+  email: string;
   role: 'member' | 'admin';
 }
 
@@ -32,14 +33,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('id, name, role')
+          .select('id, name, email, role')
           .eq('id', session.user.id)
           .single();
 
         if (error) throw error;
         
         if (data) {
-          setUser({ id: data.id, name: data.name, role: data.role as 'member' | 'admin' });
+          setUser({ id: data.id, name: data.name, email: data.email, role: data.role as 'member' | 'admin' });
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
