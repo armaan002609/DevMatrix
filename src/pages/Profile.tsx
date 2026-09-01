@@ -10,17 +10,19 @@ export default function Profile() {
 
   useEffect(() => {
     if (user) {
-      supabase
-        .from('users')
-        .select(`
-          *,
-          event_registrations(
-            events(*)
-          )
-        `)
-        .eq('id', user.id)
-        .single()
-        .then(({ data, error }) => {
+      const fetchProfile = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              *,
+              event_registrations(
+                events(*)
+              )
+            `)
+            .eq('id', user.id)
+            .single();
+
           if (error) {
             console.error(error);
           } else if (data) {
@@ -34,8 +36,11 @@ export default function Profile() {
             };
             setProfile(mappedProfile);
           }
-        })
-        .finally(() => setLoading(false));
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProfile();
     }
   }, [user]);
 
