@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import EventDetail from './pages/EventDetail';
+import Galleries from './pages/Galleries';
 
 function App() {
   const { user, logout, loading } = useAuth();
@@ -59,9 +60,9 @@ function App() {
               </div>
               
               <div className="nav-item">
-                <Link to="/">Images ▾</Link>
+                <Link to="/galleries">Images ▾</Link>
                 <div className="mega-menu" style={{ left: '-300px' }}>
-                  <Link to="/" className="mega-card mega-card-large">
+                  <Link to="/galleries" className="mega-card mega-card-large">
                     <h3>Event Galleries</h3>
                     <p>Browse through high-quality photos from past events.</p>
                   </Link>
@@ -178,7 +179,7 @@ function App() {
           {isMobileMenuOpen && (
             <div className="mobile-menu-container show-mobile-flex" style={{ display: 'none' }}>
               <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Events</Link>
-              <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Images</Link>
+              <Link to="/galleries" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Images</Link>
               <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Videos</Link>
               <Link to="/" className="mobile-menu-link" onClick={() => setIsMobileMenuOpen(false)}>Blogs</Link>
               
@@ -211,6 +212,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/galleries" element={<Galleries />} />
           </Routes>
         </main>
         

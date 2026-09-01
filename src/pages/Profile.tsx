@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function Profile() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -81,7 +81,10 @@ export default function Profile() {
       alert('Error saving profile: ' + error.message);
     } else {
       setIsEditing(false);
-      fetchProfile();
+      await fetchProfile();
+      if (refreshUser) {
+        await refreshUser();
+      }
     }
   };
 
