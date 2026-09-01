@@ -41,9 +41,9 @@ export default function Home() {
         <p className="hero-description" style={{ color: 'var(--text-secondary)', maxWidth: '900px', marginBottom: '40px', fontWeight: 400 }}>
           Our mission is to establish a collaborative software innovation ecosystem where students design, develop, deploy, and maintain real-world software solutions. We are here to foster innovation, drive entrepreneurship, and make meaningful open-source contributions.
         </p>
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" style={{ padding: '14px 32px' }}>JOIN THE TEAM</button>
-          <button className="btn btn-secondary" style={{ padding: '14px 32px' }}>VIEW PROJECTS</button>
+        <div className="hero-buttons">
+          <button className="btn btn-primary">JOIN THE TEAM</button>
+          <button className="btn btn-secondary">VIEW PROJECTS</button>
         </div>
       </div>
 

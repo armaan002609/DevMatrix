@@ -319,6 +319,11 @@ a:hover {
   font-size: 1.25rem;
 }
 
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+}
+
 /* --- Responsive Styles --- */
 @media (max-width: 1024px) {
   h1 { font-size: 3.5rem; }
@@ -378,6 +383,19 @@ a:hover {
   
   .hero-description {
     font-size: 1.05rem !important;
+  }
+  
+  .hero-buttons {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+  
+  .hero-buttons .btn {
+    flex: 1;
+    padding: 12px 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
   }
   
   .btn {
