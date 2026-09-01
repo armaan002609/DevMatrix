@@ -1,0 +1,9 @@
+{
+  "name": "antigravity",
+  "version": "1.0.0",
+  "description": "Antigravity club platform",
+  "private": true,
+  "workspaces": [
+    "client"
+  ]
+}
