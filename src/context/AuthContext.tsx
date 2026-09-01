@@ -37,10 +37,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq('id', session.user.id)
           .single();
 
-        if (error) throw error;
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching profile, but proceeding with session:', error);
+        }
         
         if (data) {
           setUser({ id: data.id, name: data.name, email: data.email, role: data.role as 'member' | 'admin' });
+        } else {
+          // Fallback if users table row doesn't exist yet
+          setUser({
+            id: session.user.id,
+            name: session.user.user_metadata?.name || 'User',
+            email: session.user.email || '',
+            role: 'member'
+          });
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
