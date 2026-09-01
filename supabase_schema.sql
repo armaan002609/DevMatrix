@@ -54,22 +54,36 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.event_registrations ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to check admin status without causing infinite recursion in RLS
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
 -- Policies for Users table
 -- 1. Users can read their own profile
 CREATE POLICY "Users can read own profile" ON public.users FOR SELECT USING (auth.uid() = id);
 -- 2. Admins can read all profiles
 CREATE POLICY "Admins can read all profiles" ON public.users FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 -- 3. Users can update their own profile
 CREATE POLICY "Users can update own profile" ON public.users FOR UPDATE USING (auth.uid() = id);
+-- 4. Users can insert their own profile (fallback if trigger fails)
+CREATE POLICY "Users can insert own profile" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Policies for Events table
 -- 1. Anyone can read published events
 CREATE POLICY "Anyone can view published events" ON public.events FOR SELECT USING (status = 'published');
 -- 2. Admins can manage all events
 CREATE POLICY "Admins can manage events" ON public.events FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- Policies for Event Registrations
@@ -77,7 +91,7 @@ CREATE POLICY "Admins can manage events" ON public.events FOR ALL USING (
 CREATE POLICY "Users can view own registrations" ON public.event_registrations FOR SELECT USING (auth.uid() = user_id);
 -- 2. Admins can see all registrations
 CREATE POLICY "Admins can view all registrations" ON public.event_registrations FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 -- 3. Users can register themselves
 CREATE POLICY "Users can register themselves" ON public.event_registrations FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -146,19 +160,19 @@ ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
 -- Policies for Images
 CREATE POLICY "Anyone can view images" ON public.images FOR SELECT USING (true);
 CREATE POLICY "Admins can manage images" ON public.images FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- Policies for Videos
 CREATE POLICY "Anyone can view videos" ON public.videos FOR SELECT USING (true);
 CREATE POLICY "Admins can manage videos" ON public.videos FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- Policies for Blogs
 CREATE POLICY "Anyone can view published blogs" ON public.blogs FOR SELECT USING (status = 'published');
 CREATE POLICY "Admins can manage blogs" ON public.blogs FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- Add new profile fields
